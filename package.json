@@ -1,0 +1,9 @@
+{
+  "name": "coding-buds",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Coding Buds — Code to Webpage converter plus the Web Wizard go-live tutorial",
+  "engines": {
+    "node": ">=18"
+  }
+}
