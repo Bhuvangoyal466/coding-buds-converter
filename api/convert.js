@@ -1,5 +1,9 @@
 const MAX_CODE_LENGTH = 20000;
 
+// Model can be changed in Vercel (Settings -> Environment Variables -> GROQ_MODEL)
+// without touching the code. See https://console.groq.com/docs/models
+const MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -63,7 +67,7 @@ Respond with only the complete HTML document, nothing else.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: MODEL,
         messages: [{ role: "user", content: prompt }],
         temperature: 0.2,
         max_tokens: 8192,
@@ -72,7 +76,10 @@ Respond with only the complete HTML document, nothing else.`;
 
     if (!response.ok) {
       const err = await response.text();
-      console.error("Groq error:", response.status, err);
+      console.error("Groq error:", response.status, "model:", MODEL, err);
+      if (response.status === 429) {
+        return res.status(429).json({ error: "Too many requests right now. Please wait a minute and try again." });
+      }
       return res.status(500).json({ error: "Conversion failed. Please try again." });
     }
 
